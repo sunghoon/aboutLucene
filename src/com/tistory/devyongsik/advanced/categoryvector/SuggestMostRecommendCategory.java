@@ -36,6 +36,7 @@ import org.apache.lucene.util.Version;
  * @author need4spd, need4spd@cplanet.co.kr, 2011. 7. 26.
  *
  */
+
 public class SuggestMostRecommendCategory {
 
 	private String indexPath = "d:/luceneindex/category";
