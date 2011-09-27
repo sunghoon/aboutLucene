@@ -4,7 +4,7 @@
 	<classpathentry kind="src" path="unitTest"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="lib/junit-4.4.jar"/>
-	<classpathentry kind="lib" path="lib/lucene-core-3.3.0.jar" sourcepath="D:/개인프로젝트/프로젝트와라이브러리들/lucene-3.3.0-src/lucene-3.3.0-src/lucene-3.3.0/src"/>
+	<classpathentry kind="lib" path="lib/lucene-core-3.3.0.jar" sourcepath="D:/Java/lucene-3.3.0/src"/>
 	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="output" path="bin"/>
