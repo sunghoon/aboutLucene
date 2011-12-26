@@ -53,8 +53,8 @@ public class RemoteTestAnalyzer extends ReusableAnalyzerBase {
 		BufferedWriter writerK = null;
 
 		try {
-			String IP = "222.239.75.103"; // Server IP
-			int port=Integer.parseInt("6503"); // Port Number
+			String IP = ""; // Server IP
+			int port=Integer.parseInt(""); // Port Number
 			socketK = new Socket(IP, port); // 지정된 IP와 port를 이용하여 Socket Object 생성
 			readerK = new BufferedReader(new InputStreamReader(socketK.getInputStream()));
 			writerK = new BufferedWriter(new OutputStreamWriter(socketK.getOutputStream()));
