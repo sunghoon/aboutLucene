@@ -46,7 +46,7 @@ public class AnalyzerUsageSampleTest {
 	
 	@Test
 	public void remoteTestAnalyzer() throws IOException {
-		StringReader stringReader = new StringReader("집에서 블로그를 작성합니다.");
+		StringReader stringReader = new StringReader("무궁화 꽃이 피었습니다.");
 		Analyzer analyzer = new RemoteTestAnalyzer();
 		TokenStream tokenStream = analyzer.reusableTokenStream("title", stringReader);
 		
