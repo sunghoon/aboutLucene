@@ -130,7 +130,7 @@ public class NearRealTimeTest {
 	        doc.add(new Field("id", "11", Field.Store.NO, Field.Index.NOT_ANALYZED_NO_NORMS));
 	        doc.add(new Field("text", "bbb", Field.Store.NO, Field.Index.ANALYZED));
 	        writer.addDocument(doc);
-	        IndexReader newReader = reader.reopen();
+	        IndexReader newReader = IndexReader.openIfChanged(reader);
 	        Assert.assertFalse(reader == newReader);
 
 	        reader.close();
