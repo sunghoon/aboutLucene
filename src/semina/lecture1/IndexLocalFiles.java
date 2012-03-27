@@ -24,9 +24,12 @@ public class IndexLocalFiles {
 
 	public static void main(String[] args) throws Exception {
 
-		String docsPath = "/Users/need4spd/Programming"; //1. 색인 대상 문서가 있는 경로 
-		String indexPath = "/Users/need4spd/Programming/lucene_index/"; //2. 색인 파일이 만들어질 경로
+		//String docsPath = "/Users/need4spd/Programming"; //1. 색인 대상 문서가 있는 경로 
+		//String indexPath = "/Users/need4spd/Programming/lucene_index/"; //2. 색인 파일이 만들어질 경로
 
+		String docsPath = "D:/programming/eulerproject/"; //1. 색인 대상 문서가 있는 경로 
+		String indexPath = "d:/programming/lucene_index/"; //2. 색인 파일이 만들어질 경로
+		
 		final File docDir = new File(docsPath);
 		if (!docDir.exists() || !docDir.canRead()) {
 			System.out.println("Document directory '" +docDir.getAbsolutePath()+ "' does not exist or is not readable, please check the path");

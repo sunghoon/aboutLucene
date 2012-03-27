@@ -18,7 +18,10 @@ public class SearchLocalFiles {
 	
 	public static void main(String[] args) throws Exception {
 
-		String index = "/Users/need4spd/Programming/lucene_index/";
+		//String index = "/Users/need4spd/Programming/lucene_index/";
+		
+		String index = "d:/programming/lucene_index/"; //2. 색인 파일이 만들어질 경로
+		
 		String field = "contents";
 		String queryString = "java";
 		int hitsPerPage = 10;
