@@ -38,7 +38,7 @@ public class DocumentIDTest {
 		
 		IndexWriter indexWriter = getWriter();
 		
-		for(int i = 0; i < Integer.MAX_VALUE; i++) {
+		for(int i = 0; i < 6; i++) {
 			Document doc = new Document();
 			doc.add(new Field("id", String.valueOf(i), Field.Store.YES, Field.Index.NOT_ANALYZED));
 			indexWriter.addDocument(doc);
