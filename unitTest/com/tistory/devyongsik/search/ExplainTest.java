@@ -6,6 +6,7 @@ import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryParser.ParseException;
@@ -53,7 +54,7 @@ public class ExplainTest {
 
 	@Test
 	public void searchByTerm() throws CorruptIndexException, IOException, ParseException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 
 		String querystr = "시크릿 가든 주연 여자 배우";
 		Query q = new QueryParser(Version.LUCENE_33, "label", new WhitespaceAnalyzer(Version.LUCENE_33)).parse(querystr);

@@ -88,7 +88,7 @@ public class RealTimeSearch {
 
 	@Test
 	public void searchAfterDocumentDeleted() throws CorruptIndexException, IOException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 		
 		Term t = new Term("ids", "1");
 		Query q = new TermQuery(t);
@@ -106,7 +106,7 @@ public class RealTimeSearch {
 	
 	@Test
 	public void searchAfterDocumentAdded() throws CorruptIndexException, IOException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 		
 		Term t = new Term("ids", "4");
 		Query q = new TermQuery(t);

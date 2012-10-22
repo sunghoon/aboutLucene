@@ -8,6 +8,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.TermVector;
 import org.apache.lucene.document.NumericField;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
@@ -68,7 +69,7 @@ public class IndexSearcherTest {
 	
 	@Test
 	public void searchByTerm() throws CorruptIndexException, IOException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 		
 		Term t = new Term("ids", "1");
 		Query q = new TermQuery(t);
@@ -95,7 +96,7 @@ public class IndexSearcherTest {
 	
 	@Test
 	public void searchByBooleanQuery() throws CorruptIndexException, IOException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 		
 		BooleanQuery resultQuery = new BooleanQuery();
 		
@@ -116,7 +117,7 @@ public class IndexSearcherTest {
 	
 	@Test
 	public void searchByTermRangeQuery() throws CorruptIndexException, IOException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 		
 		Query q = new TermRangeQuery("titles2", "h", "j", true, true);
 		TopDocs docs = indexSearcher.search(q, 10);
@@ -126,7 +127,7 @@ public class IndexSearcherTest {
 	
 	@Test
 	public void searchByNumericRangeQuery() throws CorruptIndexException, IOException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 		
 		Query q = NumericRangeQuery.newIntRange("price", 2000, 4000, true, true);
 		TopDocs docs = indexSearcher.search(q, 10);

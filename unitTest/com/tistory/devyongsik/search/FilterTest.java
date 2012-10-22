@@ -8,6 +8,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.TermVector;
 import org.apache.lucene.document.NumericField;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.FieldCacheTermsFilter;
@@ -69,7 +70,7 @@ public class FilterTest {
 	
 	@Test
 	public void filterByTerm() throws CorruptIndexException, IOException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 		
 		Query allQuery = new MatchAllDocsQuery();
 		Filter f = new FieldCacheTermsFilter("ids", "2");
@@ -80,7 +81,7 @@ public class FilterTest {
 
 	@Test
 	public void filterByPriceRange() throws CorruptIndexException, IOException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 		
 		Query allQuery = new MatchAllDocsQuery();
 		Filter f = NumericRangeFilter.newIntRange("price", 2000, 4000, true, true);
