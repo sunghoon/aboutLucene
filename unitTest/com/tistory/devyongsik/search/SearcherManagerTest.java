@@ -11,8 +11,8 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.SearcherFactory;
 import org.apache.lucene.search.SearcherManager;
-import org.apache.lucene.search.SearcherWarmer;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
@@ -50,16 +50,18 @@ public class SearcherManagerTest {
 	}
 	
 	@Test
-	public void searcherManagerWithIndexWriterCommit() throws IOException {
-		SearcherManager searcherManager = new SearcherManager(directory, new SearcherWarmer(){
-
-			@Override
-			public void warm(IndexSearcher arg0) throws IOException {
-				System.out.println("nothing to do");
-				
-			}
-			
-		}, null);
+	public void acquireWithIndexWriterCommit() throws IOException {
+//		SearcherManager searcherManager = new SearcherManager(directory, new SearcherWarmer(){
+//
+//			@Override
+//			public void warm(IndexSearcher arg0) throws IOException {
+//				System.out.println("nothing to do");
+//				
+//			}
+//			
+//		}, null);
+		
+		SearcherManager searcherManager = new SearcherManager(directory, new SearcherFactory());
 		
 		IndexSearcher indexSearcher = searcherManager.acquire();
 		Term t = new Term("id", "4");
@@ -85,16 +87,18 @@ public class SearcherManagerTest {
 	}
 	
 	@Test
-	public void maybeReopenWithNoCommit() throws Exception {
-		SearcherManager searcherManager = new SearcherManager(directory, new SearcherWarmer(){
-
-			@Override
-			public void warm(IndexSearcher arg0) throws IOException {
-				System.out.println("nothing to do");
-				
-			}
-			
-		}, null);
+	public void acquireWithIndexWriterNoCommit() throws IOException {
+//		SearcherManager searcherManager = new SearcherManager(directory, new SearcherWarmer(){
+//
+//			@Override
+//			public void warm(IndexSearcher arg0) throws IOException {
+//				System.out.println("nothing to do");
+//				
+//			}
+//			
+//		}, null);
+		
+		SearcherManager searcherManager = new SearcherManager(directory, new SearcherFactory());
 		
 		IndexSearcher indexSearcher = searcherManager.acquire();
 		Term t = new Term("id", "4");
@@ -120,16 +124,57 @@ public class SearcherManagerTest {
 	}
 	
 	@Test
-	public void maybeReopenWithCommit() throws Exception {
-		SearcherManager searcherManager = new SearcherManager(directory, new SearcherWarmer(){
-
-			@Override
-			public void warm(IndexSearcher arg0) throws IOException {
-				System.out.println("nothing to do");
-				
-			}
-			
-		}, null);
+	public void maybeRefreshWithNoCommit() throws Exception {
+//		SearcherManager searcherManager = new SearcherManager(directory, new SearcherWarmer(){
+//
+//			@Override
+//			public void warm(IndexSearcher arg0) throws IOException {
+//				System.out.println("nothing to do");
+//				
+//			}
+//			
+//		}, null);
+		
+		SearcherManager searcherManager = new SearcherManager(directory, new SearcherFactory());
+		
+		IndexSearcher indexSearcher = searcherManager.acquire();
+		Term t = new Term("id", "4");
+		Query q = new TermQuery(t);
+		TopDocs docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(1, docs.totalHits);
+		
+		searcherManager.release(indexSearcher);
+		indexSearcher = null;
+		
+		Document doc = new Document();
+		doc.add(new Field("id", String.valueOf(4), Field.Store.YES, Field.Index.NOT_ANALYZED));
+		IndexWriter writer = getWriter();
+		writer.addDocument(doc);
+		//writer.commit();
+		//writer.close();
+		
+		searcherManager.maybeRefresh();
+		
+		indexSearcher = searcherManager.acquire();
+		docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(1, docs.totalHits);
+	}
+	
+	@Test
+	public void maybeRefreshWithCommit() throws Exception {
+//		SearcherManager searcherManager = new SearcherManager(directory, new SearcherWarmer(){
+//
+//			@Override
+//			public void warm(IndexSearcher arg0) throws IOException {
+//				System.out.println("nothing to do");
+//				
+//			}
+//			
+//		}, null);
+		
+		SearcherManager searcherManager = new SearcherManager(directory, new SearcherFactory());
 		
 		IndexSearcher indexSearcher = searcherManager.acquire();
 		Term t = new Term("id", "4");
@@ -148,7 +193,8 @@ public class SearcherManagerTest {
 		writer.commit();
 		writer.close();
 		
-		searcherManager.maybeReopen();
+		//searcherManager.maybeReopen();
+		searcherManager.maybeRefresh();
 		
 		indexSearcher = searcherManager.acquire();
 		docs = indexSearcher.search(q, 10);
