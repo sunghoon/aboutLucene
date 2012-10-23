@@ -201,4 +201,76 @@ public class SearcherManagerTest {
 		
 		Assert.assertEquals(2, docs.totalHits);
 	}
+	
+	@Test
+	public void acquireIndexWriterWithNoCommit() throws Exception {
+//		SearcherManager searcherManager = new SearcherManager(directory, new SearcherWarmer(){
+//
+//			@Override
+//			public void warm(IndexSearcher arg0) throws IOException {
+//				System.out.println("nothing to do");
+//				
+//			}
+//			
+//		}, null);
+		
+		IndexWriter indexWriter = getWriter();
+		SearcherManager searcherManager = new SearcherManager(indexWriter, true, new SearcherFactory());
+		
+		IndexSearcher indexSearcher = searcherManager.acquire();
+		Term t = new Term("id", "4");
+		Query q = new TermQuery(t);
+		TopDocs docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(1, docs.totalHits);
+		
+		searcherManager.release(indexSearcher);
+		indexSearcher = null;
+		
+		Document doc = new Document();
+		doc.add(new Field("id", String.valueOf(4), Field.Store.YES, Field.Index.NOT_ANALYZED));
+		indexWriter.addDocument(doc);
+		
+		indexSearcher = searcherManager.acquire();
+		docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(1, docs.totalHits);
+	}
+	
+	@Test
+	public void maybeRefreshIndexWriterWithNoCommit() throws Exception {
+//		SearcherManager searcherManager = new SearcherManager(directory, new SearcherWarmer(){
+//
+//			@Override
+//			public void warm(IndexSearcher arg0) throws IOException {
+//				System.out.println("nothing to do");
+//				
+//			}
+//			
+//		}, null);
+		
+		IndexWriter indexWriter = getWriter();
+		SearcherManager searcherManager = new SearcherManager(indexWriter, true, new SearcherFactory());
+		
+		IndexSearcher indexSearcher = searcherManager.acquire();
+		Term t = new Term("id", "4");
+		Query q = new TermQuery(t);
+		TopDocs docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(1, docs.totalHits);
+		
+		searcherManager.release(indexSearcher);
+		indexSearcher = null;
+		
+		Document doc = new Document();
+		doc.add(new Field("id", String.valueOf(4), Field.Store.YES, Field.Index.NOT_ANALYZED));
+		indexWriter.addDocument(doc);
+		
+		searcherManager.maybeRefresh();
+		
+		indexSearcher = searcherManager.acquire();
+		docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(2, docs.totalHits);
+	}
 }
