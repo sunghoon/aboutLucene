@@ -35,7 +35,7 @@ public class DevysStopFilterTest {
 	
 	@Test
 	public void stopFilter() throws IOException {
-		TokenStream stream = new DevysStopFilter(new DevysTokenizer(reader));
+		TokenStream stream = new DevysStopFilter(true, new DevysTokenizer(reader));
 		CharTermAttribute charTermAttr = stream.getAttribute(CharTermAttribute.class);
 		PositionIncrementAttribute positionAttr = stream.getAttribute(PositionIncrementAttribute.class);
 		
