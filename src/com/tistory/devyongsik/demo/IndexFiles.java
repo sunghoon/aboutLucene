@@ -51,7 +51,7 @@ public class IndexFiles {
   /** Index all text files under a directory. */
   public static void main(String[] args) {
     
-	String docsPath = "/Users/need4spd/Programming/Java/workspace/crescent"; //1. 색인 대상 문서가 있는 경로 
+	String docsPath = "/Users/need4spd/Programming/Java/workspace/crescent/crescent_core_web/src"; //1. 색인 대상 문서가 있는 경로 
 	String indexPath = "/Users/need4spd/Java/lucene_index/"; //2. 색인 파일이 만들어질 경로
 	
     final File docDir = new File(docsPath);

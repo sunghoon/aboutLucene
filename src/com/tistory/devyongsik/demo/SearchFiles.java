@@ -42,7 +42,7 @@ public class SearchFiles {
 
     String index = "/Users/need4spd/Java/lucene_index/"; //1. 인덱스 파일이 있는 경로
     String field = "contents"; //2. 키워드로 검색 할 필
-    String queryString = "java main"; //3. 루씬에서 사용되는 검색쿼리
+    String queryString = "java"; //3. 루씬에서 사용되는 검색쿼리
     int hitsPerPage = 10; //4. 한 페이지에 보여 줄 검색 결과 수
     
     //5. 인덱스 파일로부터 검색을 하기 위한 IndexSearcher를 생성합니다.
