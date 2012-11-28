@@ -65,6 +65,29 @@ public class NRTManagerTest {
 	}
 	
 	@Test
+	public void NRTManagerWithIndexWriterTest() throws CorruptIndexException, LockObtainFailedException, IOException {
+		IndexWriter writer = getWriter();
+		NRTManager.TrackingIndexWriter trackingIndexWriter = new NRTManager.TrackingIndexWriter(writer);
+		NRTManager nrtManager = new NRTManager(trackingIndexWriter, new SearcherFactory());
+		
+		IndexSearcher indexSearcher = nrtManager.acquire();
+		Term t = new Term("id", "4");
+		Query q = new TermQuery(t);
+		TopDocs docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(1, docs.totalHits);
+		
+		trackingIndexWriter.getIndexWriter().close();
+		docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(1, docs.totalHits);
+		
+		Document doc = new Document();
+		doc.add(new Field("id", String.valueOf(4), Field.Store.YES, Field.Index.NOT_ANALYZED));
+		trackingIndexWriter.addDocument(doc);
+	}
+	
+	@Test
 	public void NRTManagerAddDocument() throws CorruptIndexException, LockObtainFailedException, IOException {
 		IndexWriter writer = getWriter();
 		NRTManager.TrackingIndexWriter trackingIndexWriter = new NRTManager.TrackingIndexWriter(writer);

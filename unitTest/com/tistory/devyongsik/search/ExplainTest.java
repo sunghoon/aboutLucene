@@ -76,7 +76,7 @@ public class ExplainTest {
 		
 		for(int i=0;i<hits.length;++i) {
 			int docId = hits[i].doc;
-			Document d = indexSearcher.doc(docId);
+			//Document d = indexSearcher.doc(docId);
 			Explanation explanation = indexSearcher.explain(q, docId);
 			System.out.println(explanation.toString());
 		}
