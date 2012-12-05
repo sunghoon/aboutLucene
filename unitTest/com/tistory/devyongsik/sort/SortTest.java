@@ -8,6 +8,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.TermVector;
 import org.apache.lucene.document.NumericField;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.IndexSearcher;
@@ -37,7 +38,7 @@ public class SortTest {
 	private Directory directory = new RAMDirectory();
 	
 	private IndexWriter getWriter() throws CorruptIndexException, LockObtainFailedException, IOException {
-		IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_33, new WhitespaceAnalyzer(Version.LUCENE_33));
+		IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_36, new WhitespaceAnalyzer(Version.LUCENE_33));
 		IndexWriter indexWriter = new IndexWriter(directory, conf);
 		
 		return indexWriter;
@@ -68,7 +69,7 @@ public class SortTest {
 
 	@Test
 	public void sortByField() throws IOException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 		
 		Query q = new MatchAllDocsQuery();
 		SortField sortField = new SortField("titles2", SortField.STRING, true);
@@ -84,7 +85,7 @@ public class SortTest {
 	
 	@Test
 	public void sortByPriceField() throws IOException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 		
 		Query q = new MatchAllDocsQuery();
 		SortField sortField = new SortField("price", SortField.INT, true);

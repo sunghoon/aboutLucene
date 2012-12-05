@@ -39,7 +39,7 @@ public class FilterTest {
 	private Directory directory = new RAMDirectory();
 	
 	private IndexWriter getWriter() throws CorruptIndexException, LockObtainFailedException, IOException {
-		IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_33, new WhitespaceAnalyzer(Version.LUCENE_33));
+		IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_36, new WhitespaceAnalyzer(Version.LUCENE_33));
 		IndexWriter indexWriter = new IndexWriter(directory, conf);
 		
 		return indexWriter;
