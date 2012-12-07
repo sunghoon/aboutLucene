@@ -48,8 +48,16 @@ public class ExplainTest {
 			indexWriter.addDocument(doc);
 		}
 
-		//indexWriter.commit();
-		indexWriter.close();
+		indexWriter.commit();
+		
+		for(int i = 0; i < labels.length; i++) {
+			Document doc = new Document();
+			doc.add(new Field("label", labels[i], Field.Store.YES, Field.Index.ANALYZED));		
+
+			indexWriter.addDocument(doc);
+		}
+		
+		//indexWriter.close();
 	}
 
 	@Test
@@ -68,7 +76,7 @@ public class ExplainTest {
 		
 		for(int i=0;i<hits.length;++i) {
 			int docId = hits[i].doc;
-			Document d = indexSearcher.doc(docId);
+			//Document d = indexSearcher.doc(docId);
 			Explanation explanation = indexSearcher.explain(q, docId);
 			System.out.println(explanation.toString());
 		}
