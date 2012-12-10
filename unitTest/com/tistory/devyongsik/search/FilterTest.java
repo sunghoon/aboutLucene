@@ -78,6 +78,8 @@ public class FilterTest {
 		Query allQuery = new MatchAllDocsQuery();
 		Filter f = new FieldCacheTermsFilter("ids", "2");
 		TopDocs docs = indexSearcher.search(allQuery, f, 10);
+		
+		System.out.println(f);
 
 		Assert.assertEquals(1, docs.totalHits);
 	}
@@ -105,6 +107,8 @@ public class FilterTest {
 		Query allQuery = new MatchAllDocsQuery();
 		Filter f = NumericRangeFilter.newIntRange("price", 2000, 4000, true, true);
 		TopDocs docs = indexSearcher.search(allQuery, f, 10);
+		
+		System.out.println(f);
 
 		Assert.assertEquals(2, docs.totalHits);
 	}
