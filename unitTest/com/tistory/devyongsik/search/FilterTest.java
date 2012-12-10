@@ -11,12 +11,15 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.FieldCacheTermsFilter;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.NumericRangeFilter;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.QueryWrapperFilter;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
@@ -79,6 +82,22 @@ public class FilterTest {
 		Assert.assertEquals(1, docs.totalHits);
 	}
 
+	@Test
+	public void filterByQuery() throws CorruptIndexException, IOException {
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
+		
+		Query allQuery = new MatchAllDocsQuery();
+		//Filter f = new FieldCacheTermsFilter("ids", "2");
+		Term t = new Term("titles", "lucene");
+		Query q = new TermQuery(t);
+		
+		Filter f = new QueryWrapperFilter(q);
+		
+		TopDocs docs = indexSearcher.search(allQuery, f, 10);
+
+		Assert.assertEquals(1, docs.totalHits);
+	}
+	
 	@Test
 	public void filterByPriceRange() throws CorruptIndexException, IOException {
 		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
