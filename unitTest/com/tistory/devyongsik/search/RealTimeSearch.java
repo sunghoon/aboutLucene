@@ -140,7 +140,7 @@ public class RealTimeSearch {
 		
 		Assert.assertFalse(indexReader.isCurrent());
 		
-		IndexReader newReader = indexReader.reopen();
+		IndexReader newReader = IndexReader.openIfChanged(indexReader);
 		if(newReader != indexReader) {
 			indexSearcher = new IndexSearcher(newReader);
 			indexReader.close();
@@ -169,7 +169,7 @@ public class RealTimeSearch {
 		
 		Assert.assertFalse(indexReader.isCurrent());
 		
-		IndexReader newReader = indexReader.reopen();
+		IndexReader newReader = IndexReader.openIfChanged(indexReader);
 		if(newReader != indexReader) {
 			indexSearcher = new IndexSearcher(newReader);
 			indexReader.close();

@@ -90,7 +90,7 @@ public class BuildQueryTest {
 		long end = 20121231L;
 		
 		
-		NumericRangeQuery nrq = NumericRangeQuery.newLongRange(field2, start, end, true, false);
+		NumericRangeQuery<Long> nrq = NumericRangeQuery.newLongRange(field2, start, end, true, false);
 		System.out.println("nrq : " + nrq);
 		
 		bq.add(nrq, Occur.MUST);
@@ -105,7 +105,7 @@ public class BuildQueryTest {
 		long end = 20121231L;
 		
 		
-		NumericRangeQuery nrq = NumericRangeQuery.newLongRange(field, start, end, true, false);
+		NumericRangeQuery<Long> nrq = NumericRangeQuery.newLongRange(field, start, end, true, false);
 		System.out.println("nrq : " + nrq);
 	}
 	

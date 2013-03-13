@@ -1,7 +1,6 @@
 package com.tistory.devyongsik.search;
 
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
@@ -26,16 +25,17 @@ public class NearRealTimeTest {
 	@Test
 	 public void testNearRealTime() throws Exception {
 	        Directory dir = new RAMDirectory();
-	        @SuppressWarnings("deprecation")
-			IndexWriter writer = new IndexWriter(dir, new StandardAnalyzer(Version.LUCENE_30), IndexWriter.MaxFieldLength.UNLIMITED);
-	        for (int i = 0; i < 10; i++) {
+	        IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_36, new WhitespaceAnalyzer(Version.LUCENE_36));
+			IndexWriter writer = new IndexWriter(dir, conf);
+			
+			for (int i = 0; i < 10; i++) {
 	            Document doc = new Document();
 	            doc.add(new Field("id", "" + i, Field.Store.NO, Field.Index.NOT_ANALYZED_NO_NORMS));
 	            doc.add(new Field("text", "aaa", Field.Store.NO, Field.Index.ANALYZED));
 	            writer.addDocument(doc);
 	        }
-	        @SuppressWarnings("deprecation")
-			IndexReader reader = writer.getReader();
+	        
+			IndexReader reader = IndexReader.open(writer, true);
 	        IndexSearcher searcher = new IndexSearcher(reader);
 
 	        Query query = new TermQuery(new Term("text", "aaa"));
@@ -48,7 +48,7 @@ public class NearRealTimeTest {
 	        doc.add(new Field("id", "11", Field.Store.NO, Field.Index.NOT_ANALYZED_NO_NORMS));
 	        doc.add(new Field("text", "bbb", Field.Store.NO, Field.Index.ANALYZED));
 	        writer.addDocument(doc);
-	        IndexReader newReader = reader.reopen();
+	        IndexReader newReader = IndexReader.openIfChanged(reader);
 	        Assert.assertFalse(reader == newReader);
 
 	        reader.close();
@@ -67,7 +67,7 @@ public class NearRealTimeTest {
 	 public void testNearRealTimeRemoveDeprecated() throws Exception {
 	        Directory dir = new RAMDirectory();
 	        
-	        IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_33, new WhitespaceAnalyzer(Version.LUCENE_33));
+	        IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_36, new WhitespaceAnalyzer(Version.LUCENE_36));
 	        IndexWriter writer = new IndexWriter(dir, conf);
 	        
 	        for (int i = 0; i < 10; i++) {
@@ -89,7 +89,7 @@ public class NearRealTimeTest {
 	        doc.add(new Field("id", "11", Field.Store.NO, Field.Index.NOT_ANALYZED_NO_NORMS));
 	        doc.add(new Field("text", "bbb", Field.Store.NO, Field.Index.ANALYZED));
 	        writer.addDocument(doc);
-	        IndexReader newReader = reader.reopen();
+	        IndexReader newReader = IndexReader.openIfChanged(reader);
 	        Assert.assertFalse(reader == newReader);
 
 	        reader.close();
@@ -144,7 +144,7 @@ public class NearRealTimeTest {
 	         
 	        //»èÁ¦ ÈÄ
 	        writer.deleteDocuments(new Term("text","bbb"));
-	        IndexReader newReader2 = newReader.reopen();
+	        IndexReader newReader2 = IndexReader.openIfChanged(newReader);
 	        Assert.assertFalse(newReader == newReader2);
 
 	        newReader.close();
