@@ -8,6 +8,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.TermVector;
 import org.apache.lucene.document.NumericField;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
@@ -62,13 +63,254 @@ public class IndexSearcherTest {
 			indexWriter.addDocument(doc);
 		}
 		
-		//indexWriter.commit();
+		indexWriter.commit();
 		indexWriter.close();
 	}
 	
 	@Test
+	public void searchAfterAddDoc() throws CorruptIndexException, IOException {
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
+		
+		Term t = new Term("ids", "1");
+		Query q = new TermQuery(t);
+		TopDocs docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(1, docs.totalHits);
+		
+		t = new Term("titles", "action");
+		q = new TermQuery(t);
+		docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(3, docs.totalHits);
+		
+		Document doc = new Document();
+		doc.add(new Field("ids", "1", Field.Store.YES, Field.Index.NOT_ANALYZED));		
+		doc.add(new Field("titles", "title", Field.Store.YES, Field.Index.ANALYZED));
+		doc.add(new Field("titles2", "title2", Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
+		doc.add(new Field("contents", "contents", Field.Store.YES, Field.Index.ANALYZED, TermVector.YES));
+		
+		NumericField numField = new NumericField("price", Field.Store.YES, true);
+		numField.setIntValue(1000);
+		doc.add(numField);
+		
+		IndexWriter writer = getWriter();
+		writer.addDocument(doc);
+		
+		Term t2 = new Term("ids", "1");
+		Query q2 = new TermQuery(t2);
+		TopDocs docs2 = indexSearcher.search(q2, 10);
+		
+		Assert.assertEquals(1, docs2.totalHits);
+		
+		writer.commit();
+		writer.close();
+		
+		docs2 = indexSearcher.search(q2, 10);
+		
+		Assert.assertEquals(1, docs2.totalHits);
+	}
+	
+	@Test
+	public void searchAfterAddDocReCreateSearcher() throws CorruptIndexException, IOException {
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
+		
+		Term t = new Term("ids", "1");
+		Query q = new TermQuery(t);
+		TopDocs docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(1, docs.totalHits);
+		
+		t = new Term("titles", "action");
+		q = new TermQuery(t);
+		docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(3, docs.totalHits);
+		
+		Document doc = new Document();
+		doc.add(new Field("ids", "1", Field.Store.YES, Field.Index.NOT_ANALYZED));		
+		doc.add(new Field("titles", "title", Field.Store.YES, Field.Index.ANALYZED));
+		doc.add(new Field("titles2", "title2", Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
+		doc.add(new Field("contents", "contents", Field.Store.YES, Field.Index.ANALYZED, TermVector.YES));
+		
+		NumericField numField = new NumericField("price", Field.Store.YES, true);
+		numField.setIntValue(1000);
+		doc.add(numField);
+		
+		IndexWriter writer = getWriter();
+		writer.addDocument(doc);
+		
+		Term t2 = new Term("ids", "1");
+		Query q2 = new TermQuery(t2);
+		TopDocs docs2 = indexSearcher.search(q2, 10);
+		
+		Assert.assertEquals(1, docs2.totalHits);
+		
+		writer.commit();
+		writer.close();
+		
+		indexSearcher = new IndexSearcher(IndexReader.open(directory));
+		docs2 = indexSearcher.search(q2, 10);
+		
+		Assert.assertEquals(2, docs2.totalHits);
+	}
+	
+	
+	/*
+	 * commit을 하지 않으면 IndexSearcher를 다시 만들어도 검색에 반영되지 않는다.
+	 */
+	@Test
+	public void searchAfterAddDocReCreateSearcherWithNoCommit() throws CorruptIndexException, IOException {
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
+		
+		Term t = new Term("ids", "1");
+		Query q = new TermQuery(t);
+		TopDocs docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(1, docs.totalHits);
+		
+		t = new Term("titles", "action");
+		q = new TermQuery(t);
+		docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(3, docs.totalHits);
+		
+		Document doc = new Document();
+		doc.add(new Field("ids", "1", Field.Store.YES, Field.Index.NOT_ANALYZED));		
+		doc.add(new Field("titles", "title", Field.Store.YES, Field.Index.ANALYZED));
+		doc.add(new Field("titles2", "title2", Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
+		doc.add(new Field("contents", "contents", Field.Store.YES, Field.Index.ANALYZED, TermVector.YES));
+		
+		NumericField numField = new NumericField("price", Field.Store.YES, true);
+		numField.setIntValue(1000);
+		doc.add(numField);
+		
+		IndexWriter writer = getWriter();
+		writer.addDocument(doc);
+		
+		Term t2 = new Term("ids", "1");
+		Query q2 = new TermQuery(t2);
+		TopDocs docs2 = indexSearcher.search(q2, 10);
+		
+		Assert.assertEquals(1, docs2.totalHits);
+		
+		//writer.commit();
+		//writer.close();
+		
+		indexSearcher = new IndexSearcher(IndexReader.open(directory));
+		docs2 = indexSearcher.search(q2, 10);
+		
+		Assert.assertEquals(1, docs2.totalHits);
+		
+		writer.commit();
+		writer.close();
+	}
+	
+	/*
+	 * commit을 하지 않으면 IndexReader.openIfChanged도 null을 반환한다.
+	 */
+	@Test
+	public void searchAfterAddDocReCreateReaderAndSearcherWithNoCommit() throws CorruptIndexException, IOException {
+		IndexReader reader = IndexReader.open(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(reader);
+		
+		Term t = new Term("ids", "1");
+		Query q = new TermQuery(t);
+		TopDocs docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(1, docs.totalHits);
+		
+		t = new Term("titles", "action");
+		q = new TermQuery(t);
+		docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(3, docs.totalHits);
+		
+		Document doc = new Document();
+		doc.add(new Field("ids", "1", Field.Store.YES, Field.Index.NOT_ANALYZED));		
+		doc.add(new Field("titles", "title", Field.Store.YES, Field.Index.ANALYZED));
+		doc.add(new Field("titles2", "title2", Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
+		doc.add(new Field("contents", "contents", Field.Store.YES, Field.Index.ANALYZED, TermVector.YES));
+		
+		NumericField numField = new NumericField("price", Field.Store.YES, true);
+		numField.setIntValue(1000);
+		doc.add(numField);
+		
+		IndexWriter writer = getWriter();
+		writer.addDocument(doc);
+		
+		Term t2 = new Term("ids", "1");
+		Query q2 = new TermQuery(t2);
+		TopDocs docs2 = indexSearcher.search(q2, 10);
+		
+		Assert.assertEquals(1, docs2.totalHits);
+		
+		//writer.commit();
+		//writer.close();
+		
+		IndexReader newReader = IndexReader.openIfChanged(reader);
+		
+		Assert.assertNull(newReader);
+		
+		writer.commit();
+		writer.close();
+	}
+	
+	/*
+	 * commit을 해야 IndexReader.openIfChanged가 새로운 reader를 반환한다.
+	 */
+	@Test
+	public void searchAfterAddDocReCreateReaderAndSearcherWithCommit() throws CorruptIndexException, IOException {
+		IndexReader reader = IndexReader.open(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(reader);
+		
+		Term t = new Term("ids", "1");
+		Query q = new TermQuery(t);
+		TopDocs docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(1, docs.totalHits);
+		
+		t = new Term("titles", "action");
+		q = new TermQuery(t);
+		docs = indexSearcher.search(q, 10);
+		
+		Assert.assertEquals(3, docs.totalHits);
+		
+		Document doc = new Document();
+		doc.add(new Field("ids", "1", Field.Store.YES, Field.Index.NOT_ANALYZED));		
+		doc.add(new Field("titles", "title", Field.Store.YES, Field.Index.ANALYZED));
+		doc.add(new Field("titles2", "title2", Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
+		doc.add(new Field("contents", "contents", Field.Store.YES, Field.Index.ANALYZED, TermVector.YES));
+		
+		NumericField numField = new NumericField("price", Field.Store.YES, true);
+		numField.setIntValue(1000);
+		doc.add(numField);
+		
+		IndexWriter writer = getWriter();
+		writer.addDocument(doc);
+		
+		Term t2 = new Term("ids", "1");
+		Query q2 = new TermQuery(t2);
+		TopDocs docs2 = indexSearcher.search(q2, 10);
+		
+		Assert.assertEquals(1, docs2.totalHits);
+		
+		writer.commit();
+		//writer.close();
+		
+		IndexReader newReader = IndexReader.openIfChanged(reader);
+		
+		indexSearcher = new IndexSearcher(newReader);
+		docs2 = indexSearcher.search(q2, 10);
+		
+		Assert.assertEquals(2, docs2.totalHits);
+		
+		writer.commit();
+		writer.close();
+	}
+	
+	@Test
 	public void searchByTerm() throws CorruptIndexException, IOException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 		
 		Term t = new Term("ids", "1");
 		Query q = new TermQuery(t);
@@ -95,7 +337,7 @@ public class IndexSearcherTest {
 	
 	@Test
 	public void searchByBooleanQuery() throws CorruptIndexException, IOException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 		
 		BooleanQuery resultQuery = new BooleanQuery();
 		
@@ -116,7 +358,7 @@ public class IndexSearcherTest {
 	
 	@Test
 	public void searchByTermRangeQuery() throws CorruptIndexException, IOException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 		
 		Query q = new TermRangeQuery("titles2", "h", "j", true, true);
 		TopDocs docs = indexSearcher.search(q, 10);
@@ -126,7 +368,7 @@ public class IndexSearcherTest {
 	
 	@Test
 	public void searchByNumericRangeQuery() throws CorruptIndexException, IOException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 		
 		Query q = NumericRangeQuery.newIntRange("price", 2000, 4000, true, true);
 		TopDocs docs = indexSearcher.search(q, 10);

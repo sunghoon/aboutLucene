@@ -91,7 +91,6 @@ public class IndexWriterTest {
 		Assert.assertEquals(ids.length-1, indexWriter.numDocs());
 		Assert.assertEquals(ids.length, indexWriter.maxDoc());
 		
-		indexWriter.optimize();
 		Assert.assertEquals(ids.length-1, indexWriter.numDocs());
 		Assert.assertEquals(ids.length-1, indexWriter.maxDoc());
 		

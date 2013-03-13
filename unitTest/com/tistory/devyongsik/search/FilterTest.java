@@ -8,14 +8,18 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.TermVector;
 import org.apache.lucene.document.NumericField;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.FieldCacheTermsFilter;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.NumericRangeFilter;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.QueryWrapperFilter;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
@@ -38,7 +42,7 @@ public class FilterTest {
 	private Directory directory = new RAMDirectory();
 	
 	private IndexWriter getWriter() throws CorruptIndexException, LockObtainFailedException, IOException {
-		IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_33, new WhitespaceAnalyzer(Version.LUCENE_33));
+		IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_36, new WhitespaceAnalyzer(Version.LUCENE_33));
 		IndexWriter indexWriter = new IndexWriter(directory, conf);
 		
 		return indexWriter;
@@ -69,22 +73,42 @@ public class FilterTest {
 	
 	@Test
 	public void filterByTerm() throws CorruptIndexException, IOException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 		
 		Query allQuery = new MatchAllDocsQuery();
 		Filter f = new FieldCacheTermsFilter("ids", "2");
 		TopDocs docs = indexSearcher.search(allQuery, f, 10);
+		
+		System.out.println(f);
 
 		Assert.assertEquals(1, docs.totalHits);
 	}
 
 	@Test
+	public void filterByQuery() throws CorruptIndexException, IOException {
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
+		
+		Query allQuery = new MatchAllDocsQuery();
+		//Filter f = new FieldCacheTermsFilter("ids", "2");
+		Term t = new Term("titles", "lucene");
+		Query q = new TermQuery(t);
+		
+		Filter f = new QueryWrapperFilter(q);
+		
+		TopDocs docs = indexSearcher.search(allQuery, f, 10);
+
+		Assert.assertEquals(1, docs.totalHits);
+	}
+	
+	@Test
 	public void filterByPriceRange() throws CorruptIndexException, IOException {
-		IndexSearcher indexSearcher = new IndexSearcher(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(IndexReader.open(directory));
 		
 		Query allQuery = new MatchAllDocsQuery();
 		Filter f = NumericRangeFilter.newIntRange("price", 2000, 4000, true, true);
 		TopDocs docs = indexSearcher.search(allQuery, f, 10);
+		
+		System.out.println(f);
 
 		Assert.assertEquals(2, docs.totalHits);
 	}

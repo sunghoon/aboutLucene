@@ -22,6 +22,8 @@ import java.io.File;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -38,19 +40,23 @@ public class SearchFiles {
   /** Simple command-line based search demo. */
   public static void main(String[] args) throws Exception {
 
-    String index = "/user/need4spd/Java/lucene_index/"; //1. 인덱스 파일이 있는 경로
+    String index = "/Users/need4spd/Java/lucene_index/"; //1. 인덱스 파일이 있는 경로
     String field = "contents"; //2. 키워드로 검색 할 필
-    String queryString = null; //3. 루씬에서 사용되는 검색쿼리
+    String queryString = "java"; //3. 루씬에서 사용되는 검색쿼리
     int hitsPerPage = 10; //4. 한 페이지에 보여 줄 검색 결과 수
     
     //5. 인덱스 파일로부터 검색을 하기 위한 IndexSearcher를 생성합니다.
-    IndexSearcher searcher = new IndexSearcher(FSDirectory.open(new File(index)));
+    IndexReader indexReader = IndexReader.open(FSDirectory.open(new File(index)));
+    
+    System.out.println("####### : " + indexReader.docFreq(new Term("contents", "java")));
+    
+    IndexSearcher searcher = new IndexSearcher(indexReader);
     
     //6. 검색 키워드를 분석 할 Analyzer를 생성합니다.
-    Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_31);
+    Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_36);
 
     //7. 쿼리식으로부터 실제 루씬에서 사용 될 Query 객체를 만들어 반환하는 QueryParser를 생성합니다.
-    QueryParser parser = new QueryParser(Version.LUCENE_31, field, analyzer);
+    QueryParser parser = new QueryParser(Version.LUCENE_36, field, analyzer);
     Query query = parser.parse(queryString);
     
     System.out.println("Query String : " + queryString);

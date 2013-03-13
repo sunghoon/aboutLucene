@@ -51,7 +51,7 @@ public class IndexFiles {
   /** Index all text files under a directory. */
   public static void main(String[] args) {
     
-	String docsPath = "/Users/need4spd/Java/"; //1. 색인 대상 문서가 있는 경로 
+	String docsPath = "/Users/need4spd/Programming/Java/workspace/crescent/crescent_core_web/src"; //1. 색인 대상 문서가 있는 경로 
 	String indexPath = "/Users/need4spd/Java/lucene_index/"; //2. 색인 파일이 만들어질 경로
 	
     final File docDir = new File(docsPath);
@@ -67,8 +67,8 @@ public class IndexFiles {
 
       //3. 여기는 루씬에서 색인을 위한 IndexWriter를 생성하는 부분입니다.
       Directory dir = FSDirectory.open(new File(indexPath));
-      Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_31); //문서 내용을 분석 할 때 사용 될 Analyzer
-      IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_31, analyzer);
+      Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_36); //문서 내용을 분석 할 때 사용 될 Analyzer
+      IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_36, analyzer);
 
       boolean create = true; //4. 색인 파일을 새로 생성 할 것인지의 여부 
       
@@ -135,7 +135,9 @@ public class IndexFiles {
         // an IO error could occur
         if (files != null) {
           for (int i = 0; i < files.length; i++) {
-            indexDocs(writer, new File(file, files[i])); //10. 재귀호출을 통해 파일이 디렉토리가 아닌 경우 문서를 색인 합니다.
+        	  if(files[i].endsWith(".java")) {
+        		  indexDocs(writer, new File(file, files[i])); //10. 재귀호출을 통해 파일이 디렉토리가 아닌 경우 문서를 색인 합니다.
+        	  }
           }
         }
       } else {
@@ -164,7 +166,6 @@ public class IndexFiles {
           //    이 필드를 생성합니다. 아래의 경우 path라는 필드명으로 파일의 path를 색인합니다.
           //	기타 옵션등에 대해서는 나중에 다시 설명을 할 예정입니다.
           Field pathField = new Field("path", file.getPath(), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS);
-          pathField.setOmitTermFreqAndPositions(true);
           doc.add(pathField);
 
           // Add the last modified date of the file a field named "modified".
@@ -190,7 +191,8 @@ public class IndexFiles {
           //    마찬가지로 나중에 다시 말씀드리겠지만, 이 예제에서는 필드에 String, Numeric, Reader등 여러 타입의
           //	내용을 추가 할 수 있다는 것을 보여줍니다.
           doc.add(new Field("contents", new BufferedReader(new InputStreamReader(fis, "UTF-8"))));
-
+          doc.add(new Field("filename", file.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
+          
           if (writer.getConfig().getOpenMode() == OpenMode.CREATE) { //16. 인덱스 파일을 새로 생성하도록 되어 있는 옵션이면 add...
             // New index, so we just add the document (no old document can be there):
             System.out.println("adding " + file);
